@@ -23,6 +23,16 @@ import org.json.JSONObject;
 
 import com.tls.base64_url.base64_url;
 
+/**
+ * @Version: 1.0
+ * @ProjectName:testLive
+ * @Filename:  tls_sigature.java
+ * @PackageName: com.tls.tls_sigature
+ * @Author: maning 马宁
+ * @Email: maning@aikxian.com
+ * @Date:2016年4月26日下午4:10:51
+ * @Copyright (c) 2016, dev@aikxian.com All Rights Reserved.
+ */
 public class tls_sigature {
 	public static class GenTLSSignatureResult
 	{
