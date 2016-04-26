@@ -2,13 +2,11 @@ package com.tls.tls_sigature;
 
 import java.io.CharArrayReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
-import java.nio.charset.Charset;
-
 import java.security.Signature;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
@@ -226,8 +224,8 @@ public class tls_sigature {
 		//System.out.println("#Json String passing in : \n" + jsonString);
 		
 		//Get TLS.Sig from json
-		JSONObject jsonObject= new JSONObject(jsonString);
-		String sigTLS = jsonObject.getString("TLS.sig");
+//		JSONObject jsonObject= new JSONObject(jsonString);
+//		String sigTLS = jsonObject.getString("TLS.sig");
 		
 		//debase64 TLS.Sig to get serailString
 		byte[] signatureBytes = decoder.decode(sigTLS.getBytes(Charset.forName("UTF-8")));
