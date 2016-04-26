@@ -232,8 +232,8 @@ public class tls_sigature {
 		
 		try{
 			
-			String sigTime = jsonObject.getString("TLS.time");
-			String sigExpire = jsonObject.getString("TLS.expire_after");
+//			String sigTime = jsonObject.getString("TLS.time");
+//			String sigExpire = jsonObject.getString("TLS.expire_after");
 			
 			//checkTime
 			//System.out.println("#time check: "+ System.currentTimeMillis()/1000 + "-" 
