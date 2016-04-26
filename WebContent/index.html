@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>腾讯互动直播Web Demo(V1.2)</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+        <link rel="stylesheet" href="css/normalize.css" />
+        <link rel="stylesheet" href="css/ion.rangeSlider.css" />
+        <link rel="stylesheet" href="css/ion.rangeSlider.skinHTML5.css" />
+        <link rel="stylesheet" type="text/css" href="css/webav_demo.css" />
+    </head>
+    <body>
+        <OBJECT ID="qavSdk" CLASSID="CLSID:DE40BADD-2131-4E8B-93CC-B5062F70B97B" codebase= "lib/qavsdk.cab#version=1,2,0,0" width= "0" height= "0"></OBJECT>
+        <div class="modal" id="select_app_dialog" tabindex="-1" role="dialog" 
+             aria-labelledby="select_app_dialog_label" aria-hidden="true" data-backdrop="static" >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+
+                        <h4 class="modal-title" id="select_app_dialog_label">
+                            腾讯互动直播Web Demo(V1.2)
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <form class="form-horizontal" role="form">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"></label>
+                                <div class="col-sm-5">
+
+                                    <label class="radio-inline">
+                                        <input type="radio" name="app_type_radio" id="at_demo_radio" 
+                                               value="1" onclick="changeAppType(this)" checked>测试应用
+                                    </label>
+
+                                </div>
+                                <div class="col-sm-5">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="app_type_radio" id="at_myself_radio" 
+                                               value="0" onclick="changeAppType(this)"> 自建应用
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"></label>
+                                <div class="col-sm-9">
+                                    <label id="demo_type_desc">无需注册腾讯云帐号直接使用，适合只需快速体验互动直播服务的用户</label>
+                                    <label id="myself_type_desc">需注册腾讯云官帐号，并创建应用获取SdkAppId和AccountType，适合需在Demo基础上进行修改调试的用户。<a href="http://console.qcloud.com/avc/" id="qcloudLink"  target="_blank">现在创建>></a></label>
+                                </div>
+                            </div>
+                            <div class="form-group" id="sdkAppIdDiv">
+                                <label class="col-sm-2 control-label"></label>
+                                <label for="sdk_app_id" class="col-sm-2 control-label">SdkAppId:</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" id="sdk_app_id" 
+                                           placeholder="请输入SdkAppId" value="">
+                                </div>
+                            </div>
+                            <div class="form-group" id="accountTypeDiv">
+                                <label class="col-sm-2 control-label"></label>
+                                <label for="account_type" class="col-sm-2 control-label">AccountType:</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" id="account_type" 
+                                           placeholder="请输入AccountType" value="">
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="selectApp()">
+                            确认
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+        <div class="content" id="qavSdkDemoDiv">
+            
+            <div class="top">
+                当前用户ID: <label id="userId"></label>
+                <input type="button" id="quitBt" value="返回登录" class="btn btn-primary quitBt" onclick="quitClick(0)">
+                <!--<iframe id="adFrame" style="background: red;width: 400px;height: 30px;position:relative;left: 600px;top:150px;"></iframe>-->
+                
+            </div>
+            <div class="middle-left">
+
+                <hr/>
+
+                <form class="form-horizontal" role="form">
+                    <!--<div class="form-group">
+                        <label for="chat_type_radio" class="col-sm-2 control-label">房间类型:</label>
+                        <div class="col-sm-10">
+
+                            <label class="radio-inline">
+                                <input type="radio" name="chat_type_radio" id="ct_vedio_radio" 
+                                       value="1" checked>视频
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="chat_type_radio" id="ct_audio_radio" 
+                                       value="0"> 语音
+                            </label>
+                        </div>
+                    </div>-->
+                    <div class="form-group">
+                        <label for="room_id" class="col-sm-3 control-label">房间号:</label>
+                        <div class="col-sm-5">
+                            <input type="text" class="form-control" id="room_id" 
+                                   placeholder="请输入1-4294967295之间的数值" value="" maxlength="10">
+
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="button" class="btn btn-primary" onclick="enterRoom()">
+                                加入房间
+                            </button>
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="button" class="btn btn-primary" onclick="exitRoom()">
+                                退出房间
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <hr/>
+
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="room_members_list" class="col-sm-3 control-label">房间成员:</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="room_members_list">
+                            </select>
+                        </div>
+                    </div>
+                    <!--<div class="form-group">
+                        <label for="win_width" class="col-sm-3 control-label">主视频画面坐标:</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" id="win_x" value="0"
+                                   placeholder="请输入X坐标" maxlength="3">
+                        </div>
+                        <div class="col-sm-1">
+                            <label class="col-sm-1 control-label">&</label>
+                        </div>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" id="win_y" value="0" 
+                                   placeholder="请输入Y坐标" maxlength="3">
+                        </div>
+                    </div>-->
+                    <div class="form-group">
+                        <label for="win_width" class="col-sm-3 control-label">主视频画面宽高:</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" id="win_width" value="480"
+                                   placeholder="请输入宽度" maxlength="4">
+                        </div>
+                        <div class="col-sm-1">
+                            <label class="col-sm-1 control-label">X</label>
+                        </div>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" id="win_height" value="360" 
+                                   placeholder="请输入高度" maxlength="4">
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="button" class="btn btn-primary" onclick="checkview()">
+                                观看成员视频画面
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <hr/>
+
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="camera_list" class="col-sm-3 control-label">摄像头选择:</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="camera_list" onchange="cameraListOnChange(this.options.selectedIndex)" >
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="camera_status_radio" class="col-sm-3 control-label">摄像头开关:</label>
+                        <div class="col-sm-8">
+
+                            <label class="radio-inline">
+                                <input type="radio" name="camera_status_radio" id="cs_on_radio" 
+                                       value="1" onclick="changeCameraStatus(this)" checked>开
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="camera_status_radio" id="cs_off_radio" 
+                                       value="0" onclick="changeCameraStatus(this)"> 关
+                            </label>
+                        </div>
+
+                    </div>
+                    <!--<div class="form-group">
+                        <label for="camera_quality_radio" class="col-sm-2 control-label">质量控制:</label>
+                        <div class="col-sm-10">
+
+                            <label class="radio-inline">
+                                <input type="radio" name="camera_quality_radio" id="cq_low_radio" 
+                                       value="0" checked>流畅
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="camera_quality_radio" id="cs_high_radio" 
+                                       value="1"> 高清
+                            </label>
+                        </div>
+                    </div>-->
+                </form>
+
+                <hr/>
+
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="mic_list" class="col-sm-3 control-label">麦克风选择:</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="mic_list" onchange="micListOnChange(this.options.selectedIndex)">
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="mic_status_radio" class="col-sm-3 control-label">麦克风开关:</label>
+                        <div class="col-sm-8">
+
+                            <label class="radio-inline">
+                                <input type="radio" name="mic_status_radio" id="cs_on_radio" 
+                                       value="1" onclick="changeMicStatus(this)" checked>开
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="mic_status_radio" id="cs_off_radio" 
+                                       value="0" onclick="changeMicStatus(this)" > 关
+                            </label>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="mic_volume_radio" class="col-sm-3 control-label">音量控制:</label>
+                        <div class="col-sm-8">
+                            <input type="text" id="mic_volume" value="50" name="mic_volume" />
+                        </div>
+                    </div>
+                </form>
+
+                <hr/>
+
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="player_list" class="col-sm-3 control-label">扬声器选择:</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="player_list" onchange="playerListOnChange(this.options.selectedIndex)">
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="player_status_radio" class="col-sm-3 control-label">扬声器开关:</label>
+                        <div class="col-sm-8">
+
+                            <label class="radio-inline">
+                                <input type="radio" name="player_status_radio" id="cs_on_radio" 
+                                       value="1" onclick="changePlayerStatus(this)" checked>开
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="player_status_radio" id="cs_off_radio" 
+                                       value="0" onclick="changePlayerStatus(this)"> 关
+                            </label>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="player_volume_radio" class="col-sm-3 control-label">音量控制:</label>
+                        <div class="col-sm-8">
+                            <input type="text" id="player_volume" value="50" name="player_volume" />
+                        </div>
+                    </div>
+                </form>
+
+
+
+
+
+            </div>
+            <div class="middle-right-top">
+
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">主视频用户:</label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"></label>
+                        <div class="col-sm-10">
+                            
+                            <div class="main-windows" id="mainView"></div>
+                            <label>用户ID:</label><label id="mainViewUserIdLabel"></label><label id="mainViewVideoStatusLabel"></label>
+                            <br/>
+                            <button type="button" class="btn btn-primary" id="stopRecordVideoBt" onclick="startRecordVideo(0)" >
+                                开始录制
+                            </button>
+                            <button type="button" class="btn btn-primary" id="stopRecordVideoBt" onclick="stopRecordVideo()" >
+                                停止录制
+                            </button>
+                            <button type="button" class="btn btn-primary" id="setMainViewAngleBt0" onclick="setMemberViewAngle('mainView',0)" >
+                                重置
+                            </button>
+                            <button type="button" class="btn btn-primary" id="setMainViewAngleBt90" onclick="setMemberViewAngle('mainView',1)" >
+                                90°(顺时针)
+                            </button>
+                            <button type="button" class="btn btn-primary" id="setMainViewAngleBt180" onclick="setMemberViewAngle('mainView',2)" >
+                                180°(顺时针)
+                            </button>
+                            <button type="button" class="btn btn-primary" id="setMainViewAngleBt270" onclick="setMemberViewAngle('mainView',3)" >
+                                270°(顺时针)
+                            </button>
+                            <!--<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">旋转<span class="caret"></span></button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#" id="setMainViewAngleLink0" onclick="setMemberViewAngle('mainView',0)">重置</a></li>
+                                <li><a href="#" id="setMainViewAngleLink90" onclick="setMemberViewAngle('mainView',1)">90°(顺时针)</a></li>
+                                <li><a href="#" id="setMainViewAngleLink180" onclick="setMemberViewAngle('mainView',2)">180°(顺时针)</a></li>
+                                <li><a href="#" id="setMainViewAngleLink270" onclick="setMemberViewAngle('mainView',3)">270°(顺时针)</a></li>
+                            </ul>-->
+                            <button type="button" class="btn btn-primary" id="cutMainViewPicBt" onclick="cutMemberViewPic(this)" >
+                                截图
+                            </button>
+                            
+                            <button type="button" class="btn btn-primary" id="fullScreenMainViewBt" onclick="fullScreenMemberView(this)" >
+                                全屏
+                            </button>
+                            <button type="button" class="btn btn-primary" id="setMainViewVolumnBt" onclick="setMemberViewVolumn(this)" value="1">
+                                静音
+                            </button>
+                            <button type="button" class="btn btn-primary" id="cancelMainViewBt" onclick="cancelViewClick(this)">
+                                关闭
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="middle-right-middle">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">其他视频用户:</label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"></label>
+                        <div class="col-sm-3">
+                            <div class="other-windows1" id="other1View"></div>
+                            <label>用户ID:</label><label id="other1ViewUserIdLabel"></label><label id="other1ViewVideoStatusLabel"></label>
+                            <br/>
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">旋转<span class="caret"></span></button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#" id="setOtherView1AngleLink0" onclick="setMemberViewAngle('otherView1',0)">重置</a></li>
+                                <li><a href="#" id="setOtherView1AngleLink90" onclick="setMemberViewAngle('otherView1',1)">90°(顺时针)</a></li>
+                                <li><a href="#" id="setOtherView1AngleLink180" onclick="setMemberViewAngle('otherView1',2)">180°(顺时针)</a></li>
+                                <li><a href="#" id="setOtherView1AngleLink270" onclick="setMemberViewAngle('otherView1',3)">270°(顺时针)</a></li>
+                            </ul>
+                            <button type="button" class="btn btn-primary" id="cutOtherViewPicBt1" onclick="cutMemberViewPic(this)" >
+                                截图
+                            </button>
+                            <button type="button" class="btn btn-primary" id="fullScreenOtherViewBt1" onclick="fullScreenMemberView(this)" >
+                                全屏
+                            </button>
+                            <button type="button" class="btn btn-primary" id="setOtherViewVolumnBt1" onclick="setMemberViewVolumn(this)" value="1">
+                                静音
+                            </button>
+                            <button type="button" class="btn btn-primary" id="setOtherToMainViewBt1" onclick="setOtherToMainView(this)" >
+                                切换&nbsp;&nbsp;
+                            </button>
+                            <button type="button" class="btn btn-primary" id="cancelOtherViewBt1" onclick="cancelViewClick(this)">
+                                关闭
+                            </button>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="other-windows2" id="other2View"></div>
+                            <label>用户ID:</label><label id="other2ViewUserIdLabel"></label><label id="other2ViewVideoStatusLabel"></label>
+                            <br/>
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">旋转<span class="caret"></span></button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#" id="setOtherView2AngleLink0" onclick="setMemberViewAngle('otherView2',0)">重置</a></li>
+                                <li><a href="#" id="setOtherView2AngleLink90" onclick="setMemberViewAngle('otherView2',1)">90°(顺时针)</a></li>
+                                <li><a href="#" id="setOtherView2AngleLink180" onclick="setMemberViewAngle('otherView2',2)">180°(顺时针)</a></li>
+                                <li><a href="#" id="setOtherView2AngleLink270" onclick="setMemberViewAngle('otherView2',3)">270°(顺时针)</a></li>
+                            </ul>
+                            <button type="button" class="btn btn-primary" id="cutOtherViewPicBt2" onclick="cutMemberViewPic(this)" >
+                                截图
+                            </button>
+                           <button type="button" class="btn btn-primary" id="fullScreenOtherViewBt2" onclick="fullScreenMemberView(this)" >
+                                全屏
+                            </button>
+                            <button type="button" class="btn btn-primary" id="setOtherViewVolumnBt2" onclick="setMemberViewVolumn(this)" value="1">
+                                静音
+                            </button>
+                            <button type="button" class="btn btn-primary" id="setOtherToMainViewBt2" onclick="setOtherToMainView(this)" >
+                                切换&nbsp;&nbsp;
+                            </button>
+                            <button type="button" class="btn btn-primary" id="cancelOtherViewBt2" onclick="cancelViewClick(this)">
+                                关闭
+                            </button>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="other-windows3" id="other3View"></div>
+                            <label>用户ID:</label><label id="other3ViewUserIdLabel"></label><label id="other3ViewVideoStatusLabel"></label>
+                            <br/>
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">旋转<span class="caret"></span></button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#" id="setOtherView3AngleLink0" onclick="setMemberViewAngle('otherView3',0)">重置</a></li>
+                                <li><a href="#" id="setOtherView3AngleLink90" onclick="setMemberViewAngle('otherView3',1)">90°(顺时针)</a></li>
+                                <li><a href="#" id="setOtherView3AngleLink180" onclick="setMemberViewAngle('otherView3',2)">180°(顺时针)</a></li>
+                                <li><a href="#" id="setOtherView3AngleLink270" onclick="setMemberViewAngle('otherView3',3)">270°(顺时针)</a></li>
+                            </ul>
+                            <button type="button" class="btn btn-primary" id="cutOtherViewPicBt3" onclick="cutMemberViewPic(this)" >
+                                截图
+                            </button>
+                            <button type="button" class="btn btn-primary" id="fullScreenOtherViewBt3" onclick="fullScreenMemberView(this)" >
+                                全屏
+                            </button>
+                            <button type="button" class="btn btn-primary" id="setOtherViewVolumnBt3" onclick="setMemberViewVolumn(this)" value="1">
+                                静音
+                            </button>
+                            <button type="button" class="btn btn-primary" id="setOtherToMainViewBt3" onclick="setOtherToMainView(this)" >
+                                切换&nbsp;&nbsp;
+                            </button>
+                            <button type="button" class="btn btn-primary" id="cancelOtherViewBt3" onclick="cancelViewClick(this)">
+                                关闭
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            <div class="middle-right-bottom">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">事件通知:</label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"></label>
+                        <div class="col-sm-9">
+                            <select multiple class="form-control" id="notice_list">
+
+                            </select>
+                        </div>
+
+                    </div>
+
+
+                </form>
+            </div>
+
+        </div>
+        <!--引入腾讯登录服务TLS web sdk-->
+        <script type="text/javascript" src="https://tls.qcloud.com/libs/api.min.js"></script>
+        <script type="text/javascript" src="js/lib/jquery/jquery.js"></script>
+        <script type="text/javascript" src="js/lib/bootstrap/bootstrap.js"></script>
+        <script type="text/javascript" src="js/lib/rangeSlider/ion.rangeSlider.min.js"></script>
+        <script type="text/javascript" src="js/webav_demo_log.js?v=3.5"></script>
+        <script type="text/javascript" src="js/webav_demo_base.js?v=3.5"></script>
+        <script type="text/javascript" src="js/webav_demo_event.js?v=3.5"></script>
+        <script type="text/javascript" src="js/webav_demo_room.js?v=3.5"></script>
+        <script type="text/javascript" src="js/webav_demo_dev.js?v=3.5"></script>
+
+        <script type="text/javascript">
+            
+                                //测试应用
+                                var sdkAppID = 1400001692;		//1400001862;  
+                                var accountType =  884;			//1019;
+ 
+                                //TLS登录成功回调地址，也就是第三方应用的首页地址,需要业务自己定义
+                                //var callBackUrl='http://avc.qcloud.com/demo/qav/websdk/index.html';
+                                var callBackUrl=null;
+                                
+                                //腾讯登录服务错误码
+                                var TlsErrorCode={
+                                    'OK':0,//成功
+                                    'SIGNATURE_EXPIRATION':11//用户身份凭证过期
+                                };
+                                
+                                //当前用户身份
+                                var loginInfo = {
+                                    sdkAppID: sdkAppID,//用户所属应用id
+                                    appIDAt3rd: sdkAppID,//用户所属应用id
+                                    accountType: accountType,//用户所属应用帐号类型
+                                    identifier: null,//当前用户ID   18511913443
+                                    userSig: null//当前用户身份凭证  eJx1j09rgzAYh*9*ipDr-iUx1jjowUlX3XSlU7r1FKKJJR2zQVNmO-bdJ1KYl73X54Hn9347AABYpPmtqKrDsbHcnoyC4B5Axii8-sPGaMmF5W4rR4wpGg7PAjKxVG90q7iorWpHi3gBGbSJoqVqrK71RWCzG8w8jAPsUupOvE5*8DH6f63TuxFmi3WUPG5jXR6zTbJYkeW6WPluJa9kKA4qQl38JJ5TEwf2nL6YU6jDfbLdv-f*Q-62IRl6ZTlqydkgv6yiprjbpX6d1U3ZL0vvaz6fJK3*VJdBXjC8RimCzo-zCxV5VzA_
+                                };
+                                
+                                //当前用户所处的状态
+                                var currentStatus = null;
+                                //状态类型
+                                var StatusType = {
+                                    'login': 1,//已登录SDK
+                                    'context': 2,//已启动SDK
+                                    'enter_room': 3//已进入房间
+                                };
+                                //用户输入的房间ID
+                                var inputRoomId=null;
+                                //当前进入房间ID
+                                var curentRoomId = null;
+                                
+                                //是否点击【返回登录】按钮标记
+                                var isQuitFlag = false;
+                                
+                                //主视频用户信息
+                                var isMainUsable = true;//是否可用
+                                var mainUserId = null;//当前用户ID
+                                var mainUserLastVideoStatus=0;//上一次用户状态(是否打开摄像头，是否打开麦克风)
+                                //第一个其他视频用户信息
+                                var isOther1Usable = true;//是否可用
+                                var otherUserId1 = null;//当前用户ID
+                                var otherUserLastVideoStatus1=0;//上一次用户状态(是否打开摄像头，是否打开麦克风)
+                                //第二个其他视频用户信息
+                                var isOther2Usable = true;//是否可用
+                                var otherUserId2 = null;//当前用户ID
+                                var otherUserLastVideoStatus2=0;//上一次用户状态(是否打开摄像头，是否打开麦克风)
+                                //第三个其他视频用户信息
+                                var isOther3Usable = true;//是否可用
+                                var otherUserId3 = null;//当前用户ID
+                                var otherUserLastVideoStatus3=0;//上一次用户状态(是否打开摄像头，是否打开麦克风)
+                                
+                                //房间成员音视频状态
+                                var AVStatus={
+                                    'NONE':0,//没有音视频
+                                    'ONLY_VIDEO':1,//只有视频
+                                    'ONLY_AUDIO':2,//只有音频
+                                    'BOTH_AUDIO_AND_VIDEO':3//都有音视频
+                                };
+                                
+                                //是否切换摄像头标记
+                                var changeCameraFlag = false;
+                                //当前使用的摄像头索引
+                                var curCameraIndex = 0;
+                                
+                                //是否切换摄像头标记
+                                var changeMicFlag = false;
+                                //当前使用的麦克风索引
+                                var curMicIndex = 0;
+                                
+                                //是否切换摄像头标记
+                                var changePlayerFlag = false;
+                                //当前使用的扬声器索引
+                                var curPlayerIndex = 0;
+
+                                //是否点击【观看成员视频画面】按钮
+                                var checkViewFlag = false;
+                                //要观看画面的成员ID
+                                var checkViewMemberId = null;
+                                //用于显示成员视频画面的div标签ID
+                                var checkViewDiv = null;
+                                //用于显示成员视频画面X坐标
+                                var checkViewPosX = 0;
+                                //用于显示成员视频画面Y坐标
+                                var checkViewPosY = 0;
+                                //用于显示成员视频画面宽度
+                                var checkViewWidth = 0;
+                                //用于显示成员视频画面高度
+                                var checkViewHeight = 0;
+                                //是否全屏显示标记
+                                var isFullScreen=false;
+                                //全屏显示时用户ID
+                                var fullScreenMemberId=null;
+                                //全屏显示时div标签ID
+                                var fullScreenMemberViewDiv=null;
+                                //截图保存路径
+                                var snapShotFilePath="d:\\qavsdkPic";
+                                //当前录制视频类型
+                                var curRecordVideoType=null;
+
+                                //事件通知条数计数
+                                var noticeCount = 0;
+                                //sdk回调事件类型
+                                var EventType={
+                                    'LOGIN':3144,//登录SDK成功通知
+                                    'START_CONTEXT':3146,//启动sdk通知
+                                    'STOP_CONTEXT':3147,//停止sdk成功通知
+                                    'ENTER_ROOM':3148,//进入房间成功通知
+                                    'EXIT_ROOM':3149,//退出房间成功通知
+                                    'ROOM_MEMBERS_CHANGE':3150,//房间成员变化通知
+                                    'REQUEST_VIEW_LIST':3153,//请求其他成员列表视频画面成功通知
+                                    'CANCEL_ALL_VIEW':3154,//取消全部成员视频画面成功通知
+                                    'MIC_STATUS_CHANGE':3155,//麦克风状态变化通知
+                                    'PLAYER_STATUS_CHANGE':3156,//扬声器状态变化通知
+                                    'CAMERA_STATUS_CHANGE':3158,//摄像头状态变化通知
+                                    'SCREEN_SHOT':3160,//截图成功通知
+                                    'START_RECORD_VIDEO':3161,//开始录制视频成功通知
+                                    'STOP_RECORD_VIDEO':3162//结束录制视频成功通知
+                                };
+                                //事件名称
+                                var EventName={
+                                    '3144':'登录',//登录SDK成功通知
+                                    '3146':'初始化上下文',//启动sdk通知
+                                    '3147':'销毁上下文',//停止sdk成功通知
+                                    '3148':'进入房间',//进入房间成功通知
+                                    '3149':'退出房间',//退出房间成功通知
+                                    '3150':'房间成员变化',//房间成员变化通知
+                                    '3153':'请求其他成员列表视频画面',//请求其他成员列表视频画面成功通知
+                                    '3154':'取消全部成员视频画面',//取消全部成员视频画面成功通知
+                                    '3155':'麦克风状态变化',//麦克风状态变化通知
+                                    '3156':'扬声器状态变化',//扬声器状态变化通知
+                                    '3158':'摄像头状态变化',//摄像头状态变化通知
+                                    '3160':'截图',//截图成功通知
+                                    '3161':'开始录制视频',//开始录制视频成功通知
+                                    '3162':'停止录制视频'//结束录制视频成功通知
+                                };
+                                
+                                //视频区域占比
+                                var ViewRatio={
+                                    'WIDTH_RATIO':0.125,////其他视频画面宽度和屏幕宽度占比
+                                    'HEIGHT_WIDTH_RATIO':0.75//视频画面高度和宽度占比
+                                };
+                                //屏幕宽度
+                                var docWidth=document.documentElement.clientWidth || document.body.clientWidth;
+                                var docHeight=document.documentElement.clientHeight || document.body.clientHeight;
+                                //主视频区域宽度
+                                var mainViewWidth=Math.round(2*docWidth*ViewRatio.WIDTH_RATIO);
+                                //其他视频区域宽度
+                                var otherViewWidth=Math.round(docWidth*ViewRatio.WIDTH_RATIO);
+                                                              
+                                //主视频区域大小
+                                var MainView={
+                                    'WIDTH':mainViewWidth,
+                                    'HEIGHT':Math.round(mainViewWidth*ViewRatio.HEIGHT_WIDTH_RATIO)
+                                };
+                                //其他视频区域大小
+                                var OtherView={
+                                    'WIDTH':otherViewWidth,
+                                    'HEIGHT':Math.round(otherViewWidth*ViewRatio.HEIGHT_WIDTH_RATIO)
+                                };  
+                                //视频画面Y坐标修正值
+                                var FIX_POSITION_Y=-20;
+                                //初始化主视频画面宽高
+                                $('#win_width').val(MainView.WIDTH);
+                                $('#win_height').val(MainView.HEIGHT);
+                                
+                                //重绘视频画面计数
+                                var relocationCount=1;
+                                
+                                //当前操作系统版本
+                                var osName=detectOS();
+                                log.info('osName='+osName);
+
+                                //刷新页面或关闭页面触发事件
+                                window.onbeforeunload = function () {
+                                    var n = window.event.screenX - window.screenLeft;
+                                    var b = n > document.documentElement.scrollWidth - 20;
+                                    if (b && window.event.clientY < 0 || window.event.altKey) {
+                                        window.event.returnValue = "";
+                                    } else {
+                                        //返回登录
+                                        quitClick(1);
+                                    }
+                                };
+                                
+                                //滚动页面触发事件
+                                window.onscroll = function () {
+                                    var docTop = document.documentElement.scrollTop || document.body.scrollTop;
+                                    var docLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
+                                    if (docTop == 0 || docTop >= 5 || docLeft == 0 || docLeft >= 5) {
+                                        //重绘视频画面显示位置
+                                        relocationView();
+                                        relocationCount++;
+                                    }
+                                };
+                                
+                                //监听按ESC键事件
+                                $(document).keyup(function(event){
+                                    switch(event.keyCode) {
+                                        case 27:
+                                            //重置全屏显示的视频画面
+                                            resetFullScreenMemberView();
+                                            break;
+                                    }
+                                });
+                                
+                                //调节麦克风音量触发事件
+                                $("#mic_volume").ionRangeSlider({
+                                    type: "single",
+                                    min: 0,
+                                    max: 100,
+                                    grid: true,
+                                    force_edges: true,
+                                    keyboard: true,
+                                    step: 1,
+                                    keyboard_step: 1,
+                                    onFinish: function (data) {
+                                        //设置麦克风音量
+                                        setMicVolumn(data.from);
+                                    }
+                                });
+                                
+                                 //调节扬声器音量触发事件
+                                $("#player_volume").ionRangeSlider({
+                                    type: "single",
+                                    min: 0,
+                                    max: 100,
+                                    grid: true,
+                                    force_edges: true,
+                                    keyboard: true,
+                                    step: 1,
+                                    keyboard_step: 1,
+                                    onFinish: function (data) {
+                                        //设置扬声器音量
+                                        setPlayerVolumn(data.from);
+                                    }
+                                });
+
+                                //判断是否已经拿到临时身份凭证
+                                if (TLSHelper.getQuery('tmpsig')) {
+                                    if (loginInfo.identifier == null) {
+                                        log.info('start fetchUserSig');
+                                        //获取正式身份凭证，成功后会回调tlsGetUserSig(res)函数
+                                        TLSHelper.fetchUserSig();
+                                    }
+                                } else {//未登录
+                                    if (loginInfo.identifier == null) {
+                                        //弹出选择应用类型对话框
+                                        $('#select_app_dialog').modal('show');
+                                        $("body").css("background-color", 'white');
+                                    }
+                                }
+
+
+        </script>
+    </body>
+</html>
